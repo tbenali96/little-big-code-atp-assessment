@@ -28,7 +28,7 @@ def fill_na_for_categorical_columns_with_condition(df: pd.DataFrame, column: str
     return df
 
 
-def scale_features(df, columns_to_scale):
+def scale_features(df: pd.DataFrame, columns_to_scale: list) -> pd.DataFrame:
     scaler = StandardScaler()
     scaler.fit(df[columns_to_scale])
     df[columns_to_scale] = scaler.transform(df[columns_to_scale])
