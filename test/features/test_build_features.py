@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-
 from src.features.build_features import extract_month_from_date, define_seed_player, define_ranking_category
 
 
