@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from src.features.build_features import extract_month_from_date, define_seed_player, define_ranking_category, \
     remove_irrelevant_columns, fill_na_for_numeric_columns_with_mean, fill_na_for_categorical_columns, \
-    fill_na_for_categorical_columns_with_condition
+    fill_na_for_categorical_columns_with_condition, convert_object_to_category
 
 
 class TestFeatures:
@@ -90,3 +90,14 @@ class TestFeatures:
         pd.testing.assert_frame_equal(new_dataframe,
                                       pd.DataFrame({'col1': ['A', 'B', np.nan, 'A'], 'col2': [6, 5, 4, 6]}))
 
+    def test_convert_object_to_category(self):
+        # README : Test à revoir
+
+        # given
+        dataframe = pd.DataFrame({'col1': ['A', 'B', 'C'], 'col2': [6, 5, 4]})
+
+        # when
+        new_dataframe = convert_object_to_category(dataframe)
+
+        # then
+        assert new_dataframe.col1.dtype == 'category'

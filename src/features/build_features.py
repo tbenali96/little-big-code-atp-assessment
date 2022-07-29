@@ -60,4 +60,14 @@ def scale_features(df: pd.DataFrame, columns_to_scale: list) -> pd.DataFrame:
     return df
 
 
+def convert_object_to_category(df: pd.DataFrame) -> pd.DataFrame:
+    object_columns = df.select_dtypes(['object']).columns
+    df[object_columns] = df[object_columns].astype('category')
+    return df
+
+
+def build_features(raw_data: pd.DataFrame, train_or_test: str) -> pd.DataFrame:
+    convert_object_to_category(raw_data)
+    pass
+
 
