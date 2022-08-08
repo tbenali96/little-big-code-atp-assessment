@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from src.features.build_features import extract_month_from_date, define_seed_player, define_ranking_category, \
     remove_irrelevant_columns, fill_na_for_numeric_columns_with_mean, fill_na_for_categorical_columns, \
-    fill_na_for_categorical_columns_with_condition, convert_object_to_category
+    fill_na_for_categorical_columns_with_condition, convert_object_to_category, build_features
 
 
 class TestFeatures:
@@ -102,5 +102,17 @@ class TestFeatures:
         # then
         assert new_dataframe.col1.dtype == 'category'
 
-    def test_build_features(self):
-        assert False
+    def test_build_features_generate_the_right_columns(self):
+        # given
+        raw_data = pd.read_csv("../sample.csv")
+
+        # when
+        data = build_features(raw_data, "train")
+
+        # then
+        pd.testing.assert_index_equal(data.columns,
+                                      pd.Index(['p2_age', 'p2_hand', 'p2_ht', 'p2_id', 'p2_ioc', 'p2_rank_points',
+                                                'match_num', 'round', 'surface', 'tourney_level', 'tourney_name',
+                                                'p1_age', 'p1_hand', 'p1_ht', 'p1_id', 'p1_ioc', 'p1_rank_points',
+                                                'p1_won', 'tourney_month', 'p1_is_seed_player', 'p2_is_seed_player',
+                                                'p1_new_rank', 'p2_new_rank']))
