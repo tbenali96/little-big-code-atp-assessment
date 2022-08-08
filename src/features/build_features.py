@@ -1,12 +1,23 @@
 import math
+import pickle
+
 import pandas as pd
 from pickle import dump
 import numpy as np
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 
+IRRELEVANT_COLUMNS = ['score', 'p1_df', 'p2_df', 'p1_bpFaced', 'p2_bpFaced', 'p1_bpSaved', 'p2_bpSaved',
+                      'p1_svpt', 'p2_svpt', 'p1_1stIn', 'p2_1stIn', 'p1_1stWon', 'p2_1stWon', 'p1_SvGms',
+                      'p2_SvGms', 'p1_2ndWon', 'p2_2ndWon', 'p1_ace', 'p2_ace', 'best_of', 'minutes']
+
+COLUMNS_WITH_TOO_MANY_CATEGORIES = ['p2_name', 'tourney_id', 'p1_name']
+
 
 def extract_month_from_date(df: pd.DataFrame, column_to_use: str, column_to_create: str) -> pd.DataFrame:
+    """
+    Extracting the month from a date with the followinf format : yyyymmdd
+    """
     df[column_to_create] = df[column_to_use].apply(lambda x: int(str(x)[4:6]))
     return df
 
@@ -67,7 +78,55 @@ def convert_object_to_category(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def build_features(raw_data: pd.DataFrame, train_or_test: str) -> pd.DataFrame:
-    convert_object_to_category(raw_data)
-    pass
+    data = remove_irrelevant_columns(raw_data, IRRELEVANT_COLUMNS)
+    data = convert_object_to_category(data)
+    data[["p1_rank", "p2_rank"]] = data[["p1_rank", "p2_rank"]].astype('category')
+    data = data.drop(columns=['p1_entry', 'p2_entry'])
 
+    list_of_numeric_columns_with_missing_values = ['p1_age', 'p2_age', 'p1_ht', 'p2_ht']
+    for element in list_of_numeric_columns_with_missing_values:
+        data = fill_na_for_numeric_columns_with_mean(data, element)
 
+    list_of_categorical_columns_with_missing_values = ['p1_hand', 'p2_hand']
+    for element in list_of_categorical_columns_with_missing_values:
+        data = fill_na_for_categorical_columns(data, element)
+
+    data.loc[data.p1_hand == 'U', 'p1_hand'] = 'R'
+    data.loc[data.p2_hand == 'U', 'p2_hand'] = 'R'
+    data['p1_hand'] = data['p1_hand'].astype('category')
+    data['p2_hand'] = data['p2_hand'].astype('category')
+
+    data = data.drop(columns=COLUMNS_WITH_TOO_MANY_CATEGORIES)
+    data[["p1_id", "p2_id"]] = data[["p1_id", "p2_id"]].astype('category')
+
+    data = extract_month_from_date(data, 'tourney_date', 'tourney_month')
+
+    data = define_seed_player(data, 'p1_seed', 'p1_is_seed_player')
+    data = define_seed_player(data, 'p2_seed', 'p2_is_seed_player')
+
+    data = define_ranking_category(data, 'p1_rank', 'p1_new_rank')
+    data = define_ranking_category(data, 'p2_rank', 'p2_new_rank')
+
+    columns_to_drop = ['p1_seed', 'p2_seed', 'tourney_date', 'p1_rank', 'p2_rank']
+    data = data.drop(columns=columns_to_drop)
+
+    list_of_new_categorical_columns_with_missing_values = ['p1_new_rank', 'p2_new_rank']
+    for element in list_of_new_categorical_columns_with_missing_values:
+        data = fill_na_for_categorical_columns(data, element)
+
+    list_of_rank_points_columns = ['p1_rank_points', 'p2_rank_points']
+    for element in list_of_rank_points_columns:
+        data = fill_na_for_categorical_columns_with_condition(data, element, data.p1_new_rank == 'Top 30')
+        data = fill_na_for_categorical_columns_with_condition(data, element, data.p1_new_rank == 'Top 30-100')
+        data = fill_na_for_categorical_columns_with_condition(data, element, data.p1_new_rank == 'Under 100')
+
+    features = data.drop(columns=['p1_won'])
+    if train_or_test == 'train':
+        numeric_columns = features.select_dtypes(['int64', 'float64']).columns
+        scaler = StandardScaler()
+        scaler.fit(data[numeric_columns])
+    else:
+        with open('../../models/scaler.pkl', 'rb') as f:
+            scaler = pickle.load(f)
+    data[numeric_columns] = scaler.transform(data[numeric_columns])
+    return data

@@ -101,3 +101,6 @@ class TestFeatures:
 
         # then
         assert new_dataframe.col1.dtype == 'category'
+
+    def test_build_features(self):
+        assert False
