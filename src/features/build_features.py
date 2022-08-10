@@ -1,6 +1,6 @@
+import logging
 import math
 import pickle
-
 import pandas as pd
 from pickle import dump
 import numpy as np
@@ -16,7 +16,7 @@ COLUMNS_WITH_TOO_MANY_CATEGORIES = ['p2_name', 'tourney_id', 'p1_name']
 
 def extract_month_from_date(df: pd.DataFrame, column_to_use: str, column_to_create: str) -> pd.DataFrame:
     """
-    Extracting the month from a date with the followinf format : yyyymmdd
+    Extracting the month from a date with the following format : yyyymmdd
     """
     df[column_to_create] = df[column_to_use].apply(lambda x: int(str(x)[4:6]))
     return df
@@ -130,3 +130,11 @@ def build_features(raw_data: pd.DataFrame, train_or_test: str) -> pd.DataFrame:
             scaler = pickle.load(f)
     data[numeric_columns] = scaler.transform(data[numeric_columns])
     return data
+
+
+if __name__ == '__main__':
+    raw = pd.read_csv("../../data/raw/ATP_tweaked.csv", sep=";")
+    logging.info("Building the features")
+    preprocessed_data = build_features(raw_data=raw, train_or_test="train")
+    logging.info("Feature Engineering done")
+    preprocessed_data.to_csv("../../data/processed/data_preprocessed.csv")
