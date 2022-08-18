@@ -11,6 +11,8 @@ IRRELEVANT_COLUMNS = ['score', 'p1_df', 'p2_df', 'p1_bpFaced', 'p2_bpFaced', 'p1
                       'p1_svpt', 'p2_svpt', 'p1_1stIn', 'p2_1stIn', 'p1_1stWon', 'p2_1stWon', 'p1_SvGms',
                       'p2_SvGms', 'p1_2ndWon', 'p2_2ndWon', 'p1_ace', 'p2_ace', 'best_of', 'minutes']
 
+TARGET_COLUMN = ['p1_won']
+
 COLUMNS_WITH_TOO_MANY_CATEGORIES = ['p2_name', 'tourney_id', 'p1_name']
 
 
@@ -63,14 +65,6 @@ def fill_na_for_categorical_columns_with_condition(df: pd.DataFrame, column: str
     return df
 
 
-def scale_features(df: pd.DataFrame, columns_to_scale: list) -> pd.DataFrame:
-    scaler = StandardScaler()
-    scaler.fit(df[columns_to_scale])
-    df[columns_to_scale] = scaler.transform(df[columns_to_scale])
-    dump(scaler, open('../models/scaler.pkl', 'wb'))
-    return df
-
-
 def convert_object_to_category(df: pd.DataFrame) -> pd.DataFrame:
     object_columns = df.select_dtypes(['object']).columns
     df[object_columns] = df[object_columns].astype('category')
@@ -120,12 +114,14 @@ def build_features(raw_data: pd.DataFrame, train_or_test: str) -> pd.DataFrame:
         data = fill_na_for_categorical_columns_with_condition(data, element, data.p1_new_rank == 'Top 30-100')
         data = fill_na_for_categorical_columns_with_condition(data, element, data.p1_new_rank == 'Under 100')
 
-    features = data.drop(columns=['p1_won'])
     if train_or_test == 'train':
+        features = data.drop(columns=TARGET_COLUMN)
         numeric_columns = features.select_dtypes(['int64', 'float64']).columns
         scaler = StandardScaler()
         scaler.fit(data[numeric_columns])
-    else:
+        dump(scaler, open('../../models/scaler.pkl', 'wb'))
+    if train_or_test == 'test':
+        numeric_columns = data.select_dtypes(['int64', 'float64']).columns
         with open('../../models/scaler.pkl', 'rb') as f:
             scaler = pickle.load(f)
     data[numeric_columns] = scaler.transform(data[numeric_columns])
@@ -137,4 +133,4 @@ if __name__ == '__main__':
     logging.info("Building the features")
     preprocessed_data = build_features(raw_data=raw, train_or_test="train")
     logging.info("Feature Engineering done")
-    preprocessed_data.to_csv("../../data/processed/data_preprocessed.csv")
+    preprocessed_data.to_csv("../../data/processed/data_preprocessed.csv", index=False)

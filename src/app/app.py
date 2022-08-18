@@ -41,8 +41,6 @@ def main_app():
         st.plotly_chart(plot_number_of_games_per_year(dataframe, str(player_name)))
 
 
-
-
 if __name__ == '__main__':
     main_app()
 
