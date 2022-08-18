@@ -13,6 +13,7 @@ Project Organization
     │   ├── processed      <- The final, canonical data sets for modeling
     │   └── raw            <- The original, immutable data dump
     │
+    ├── visualizations     <- Data Exploration Charts
     │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
@@ -46,6 +47,9 @@ Project Organization
     │       └── train_model.py
     │
     ├── test               <- Tests
+    ├── setup.cfg          <- Configuration file
+    ├── .pre-commit-config.yaml     <- Configuration file for creating a pre-commit hook to evaluate the code's format with black and flake8
+    ├── pyproject.toml               <- Configuration files
     │
     └── .gitignore         <- A gitignore file
 
