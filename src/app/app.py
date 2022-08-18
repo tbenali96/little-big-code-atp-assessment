@@ -36,7 +36,8 @@ def main_app():
         dataframe = pd.read_csv(uploaded_file, sep=";")
         dataframe = extract_date(dataframe)
         st.write(dataframe)
-        player_name = st.selectbox('Choose the player of whom you wish to see the stats', np.sort(dataframe.p1_name.unique()))
+        player_name = st.selectbox('Choose the player of whom you wish to see the stats',
+                                   np.sort(dataframe.p1_name.unique()))
         st.plotly_chart(plot_rankings_for_player_per_year(dataframe, str(player_name)))
         st.plotly_chart(plot_number_of_games_per_year(dataframe, str(player_name)))
 

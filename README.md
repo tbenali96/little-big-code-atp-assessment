@@ -6,57 +6,79 @@ Predicting the winners of tennis matches
 Project Organization
 ------------
 
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
-    ├── README.md          <- The top-level README for developers using this project.
+    ├── Makefile           <- Makefile with the necessary commands to work with the repository
+    ├── README.md          <- The top-level README for developers using this project
     ├── data
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
+    │   ├── test           <- Test data
+    │   ├── processed      <- The final, canonical data sets for modeling
+    │   └── raw            <- The original, immutable data dump
     │
-    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
     │
     ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.│
+    ├── notebooks          <- Jupyter notebooks
     │
     ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
     │                         generated with `pip freeze > requirements.txt`
     │
     ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
+    ├── src                <- Source code for use in this project
     │   ├── __init__.py    <- Makes src a Python module
     │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   ├── __init__.py    <- Makes data a Python module 
-    │   │   └── preprocess.py
+    │   │
+    │   ├── utils       <- Scripts with util functions
+    │   │    ├── __init__.py    <- Makes features a Python module 
+    │   │    └── utils.py
     │   │
     │   ├── features       <- Scripts to turn raw data into features for modeling
     │   │    ├── __init__.py    <- Makes features a Python module 
     │   │    └── build_features.py
+    │   │
+    │   ├── app       <- Scripts to create a simple dashboard on streamlit
+    │   │    ├── __init__.py    <- Makes features a Python module 
+    │   │    ├── logo.png    <- LittleBigCode Logo 
+    │   │    └── app.py
     │   │
     │   └── models         <- Scripts to train models and then use trained models to make
     │       │                 predictions
     │       ├── __init__.py    <- Makes models a Python module  
     │       ├── predict_model.py
     │       └── train_model.py
-    ├── test               <- Tests
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── test_preprocess.py
-    │   │
-    │   └──features       <- Scripts to turn raw data into features for modeling
-    │       └── test_build_features.py
     │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
+    ├── test               <- Tests
+    │
+    └── .gitignore         <- A gitignore file
 
 
 --------
 
+The following are some command lines to help use the source code of this project : 
 
-Cas d'usages possibles : 
-- Sponsors 
-- Sites de paris sportifs
-
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+Once you cloned the repository, you first need to create a virtual environment and make sure to download the right libraries. To do so, use :
+```
+make requirements
+```
+To launch the web app in order to see some visualizations, you use : 
+```
+make app
+```
+For our project, the data is stored in the repository. To build the features, you use :
+```
+make data
+```
+To train the model, you use :
+```
+make train
+```
+For the inference part, we are here working with a sample dataset. The following command will help make the inference on this particular dataset. 
+But, in a production environment, we will have to make the dataset an argument for our inference function. 
+```
+make predict
+```
+To test and evaluate coverage of our code, you can use :
+```
+make test
+```
+Ultimately, the objective of the tests is to create a CI/CD pipeline to validate the correctness of our source code. It is important to note that the tests 
+that we created are only related to the code itself, not the Machine Learning artifacts. 
+We can, for example, add other tests that evaluate the validity of the model before putting into production. 
