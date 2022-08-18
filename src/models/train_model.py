@@ -9,12 +9,14 @@ def train_model(dataframe: pd.DataFrame, target_column: str) -> CatBoostClassifi
     X = df.drop(columns=[target_column])
     y = df[target_column]
     categorical_indexes = extract_categorical_indexes_from_df(X)
-    model = CatBoostClassifier(random_seed=0,
-                               cat_features=categorical_indexes,
-                               eval_metric="Precision",
-                               iterations=1500,
-                               learning_rate=0.05,
-                               max_depth=4)
+    model = CatBoostClassifier(
+        random_seed=0,
+        cat_features=categorical_indexes,
+        eval_metric="Precision",
+        iterations=1500,
+        learning_rate=0.05,
+        max_depth=4,
+    )
     model.fit(X, y)
     model.save_model('../../models/catboost_model.pkl')
     return model

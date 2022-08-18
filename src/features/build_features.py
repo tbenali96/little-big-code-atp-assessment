@@ -7,16 +7,38 @@ import numpy as np
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 
-IRRELEVANT_COLUMNS = ['score', 'p1_df', 'p2_df', 'p1_bpFaced', 'p2_bpFaced', 'p1_bpSaved', 'p2_bpSaved',
-                      'p1_svpt', 'p2_svpt', 'p1_1stIn', 'p2_1stIn', 'p1_1stWon', 'p2_1stWon', 'p1_SvGms',
-                      'p2_SvGms', 'p1_2ndWon', 'p2_2ndWon', 'p1_ace', 'p2_ace', 'best_of', 'minutes']
+IRRELEVANT_COLUMNS = [
+    'score',
+    'p1_df',
+    'p2_df',
+    'p1_bpFaced',
+    'p2_bpFaced',
+    'p1_bpSaved',
+    'p2_bpSaved',
+    'p1_svpt',
+    'p2_svpt',
+    'p1_1stIn',
+    'p2_1stIn',
+    'p1_1stWon',
+    'p2_1stWon',
+    'p1_SvGms',
+    'p2_SvGms',
+    'p1_2ndWon',
+    'p2_2ndWon',
+    'p1_ace',
+    'p2_ace',
+    'best_of',
+    'minutes',
+]
 
 TARGET_COLUMN = ['p1_won']
 
 COLUMNS_WITH_TOO_MANY_CATEGORIES = ['p2_name', 'tourney_id', 'p1_name']
 
 
-def extract_month_from_date(df: pd.DataFrame, column_to_use: str, column_to_create: str) -> pd.DataFrame:
+def extract_month_from_date(
+    df: pd.DataFrame, column_to_use: str, column_to_create: str
+) -> pd.DataFrame:
     """
     Extracting the month from a date with the following format : yyyymmdd
     """
@@ -24,12 +46,16 @@ def extract_month_from_date(df: pd.DataFrame, column_to_use: str, column_to_crea
     return df
 
 
-def define_seed_player(df: pd.DataFrame, column_to_use: str, column_to_create: str) -> pd.DataFrame:
+def define_seed_player(
+    df: pd.DataFrame, column_to_use: str, column_to_create: str
+) -> pd.DataFrame:
     df[column_to_create] = df[column_to_use].apply(lambda x: int(not math.isnan(x)))
     return df
 
 
-def define_ranking_category(df: pd.DataFrame, column_to_use: str, column_to_create: str) -> pd.DataFrame:
+def define_ranking_category(
+    df: pd.DataFrame, column_to_use: str, column_to_create: str
+) -> pd.DataFrame:
     def define_rank(x):
         if x < 31:
             return 'Top 30'
@@ -46,7 +72,9 @@ def remove_irrelevant_columns(df: pd.DataFrame, columns: list) -> pd.DataFrame:
     return df.drop(columns=columns)
 
 
-def fill_na_for_numeric_columns_with_mean(df: pd.DataFrame, column: str) -> pd.DataFrame:
+def fill_na_for_numeric_columns_with_mean(
+    df: pd.DataFrame, column: str
+) -> pd.DataFrame:
     df[column] = df[column].fillna(df[column].mean())
     return df
 
@@ -58,7 +86,9 @@ def fill_na_for_categorical_columns(df: pd.DataFrame, column: str) -> pd.DataFra
     return df
 
 
-def fill_na_for_categorical_columns_with_condition(df: pd.DataFrame, column: str, condition: bool) -> pd.DataFrame:
+def fill_na_for_categorical_columns_with_condition(
+    df: pd.DataFrame, column: str, condition: bool
+) -> pd.DataFrame:
     col_imputer = SimpleImputer(missing_values=np.nan, strategy='most_frequent')
     col_imputer.fit(df[condition][[column]])
     df.loc[condition, column] = col_imputer.transform(df[condition][[column]])
@@ -110,9 +140,15 @@ def build_features(raw_data: pd.DataFrame, train_or_test: str) -> pd.DataFrame:
 
     list_of_rank_points_columns = ['p1_rank_points', 'p2_rank_points']
     for element in list_of_rank_points_columns:
-        data = fill_na_for_categorical_columns_with_condition(data, element, data.p1_new_rank == 'Top 30')
-        data = fill_na_for_categorical_columns_with_condition(data, element, data.p1_new_rank == 'Top 30-100')
-        data = fill_na_for_categorical_columns_with_condition(data, element, data.p1_new_rank == 'Under 100')
+        data = fill_na_for_categorical_columns_with_condition(
+            data, element, data.p1_new_rank == 'Top 30'
+        )
+        data = fill_na_for_categorical_columns_with_condition(
+            data, element, data.p1_new_rank == 'Top 30-100'
+        )
+        data = fill_na_for_categorical_columns_with_condition(
+            data, element, data.p1_new_rank == 'Under 100'
+        )
 
     if train_or_test == 'train':
         features = data.drop(columns=TARGET_COLUMN)
