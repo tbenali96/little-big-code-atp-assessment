@@ -1,7 +1,7 @@
 little-big-code-atp-assessment
 ==============================
 
-Predicting the winners of tennis matches
+The goal of the project is to create a model capable of predicting the winners of tennis matches.
 
 Project Organization
 ------------
