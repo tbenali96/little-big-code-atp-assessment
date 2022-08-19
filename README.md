@@ -66,6 +66,7 @@ To launch the web app in order to see some visualizations, you use :
 ```
 make app
 ```
+For the app, the user is asked to load a dataset, you can use the "ATP_tweaked.csv" dataset that is stored in `data/raw`.
 For our project, the data is stored in the repository. To build the features, you use :
 ```
 make data
